@@ -23,6 +23,16 @@ private:
 	btDiscreteDynamicsWorld* dynamicsWorld;
 // </Переменные Bullet Physics>
 
+
+
+// <Тестовые переменные>
+	Ogre::Entity* sphere001;
+	Ogre::SceneNode *node001;
+	btRigidBody* fallRigidBody;
+// </Тестовые переменные>
+
+
+
 // <Инициализация графики>
 	void graphics_init()
 	{
@@ -63,11 +73,47 @@ private:
 // <Просчёт физики>
 	void physics_execution()
 	{
-
+		dynamicsWorld->stepSimulation(1 / 60.f, 10);
+		// <Тест>
+		btTransform trans;
+		fallRigidBody->getMotionState()->getWorldTransform(trans);
+		// </Тест>
 	}
 // </Просчёт физики>
 
 public:
+
+
+
+// <Тестовый блок>
+
+	void test_load_resource()
+	{
+		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("resource/sphere.zip","Zip");
+		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+	}
+
+	void test_create_objects()
+	{
+		// Ogre
+		sphere001 = sceneManager->createEntity("sphere.mesh");
+		node001 = sceneManager->createSceneNode("node001");
+		sceneManager->getRootSceneNode()->addChild(node001);
+		node001->attachObject(sphere001);
+		// Bullet
+		btCollisionShape* fallShape = new btSphereShape(1);
+		btDefaultMotionState* fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 50, 0)));
+		btScalar mass = 1;
+        btVector3 fallInertia(0, 0, 0);
+        fallShape->calculateLocalInertia(mass, fallInertia);
+		btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
+        fallRigidBody = new btRigidBody(fallRigidBodyCI);
+        dynamicsWorld->addRigidBody(fallRigidBody);
+	}
+
+// </Тестовый бкок>
+
+
 
 // <Инициализация>
 	void init()
@@ -80,6 +126,13 @@ public:
 // <Выполнение>
 	void execution()
 	{
+		// <Тест>
+		btTransform worldTrans;
+		btQuaternion rot = worldTrans.getRotation();
+        node001->setOrientation(rot.w(), rot.x(), rot.y(), rot.z());
+        btVector3 pos = worldTrans.getOrigin();
+        node001->setPosition(pos.x(), pos.y(), pos.z());
+		// </Тест>
 		graphics_execution();
 		physics_execution();
 	}
@@ -91,6 +144,8 @@ int main (void)
 {
 	game_engine game_one;
 	game_one.init();
+	game_one.test_load_resource();
+	game_one.test_create_objects();
 	while(true)
 	{
 		game_one.execution();
