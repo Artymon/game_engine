@@ -73,10 +73,10 @@ private:
 // <Просчёт физики>
 	void physics_execution()
 	{
-		dynamicsWorld->stepSimulation(1 / 60.f, 10);
+	//	dynamicsWorld->stepSimulation(1 / 60.f, 10);
 		// <Тест>
-		btTransform trans;
-		fallRigidBody->getMotionState()->getWorldTransform(trans);
+	//	btTransform trans;
+	//	fallRigidBody->getMotionState()->getWorldTransform(trans);
 		// </Тест>
 	}
 // </Просчёт физики>
@@ -104,11 +104,11 @@ public:
 		btCollisionShape* fallShape = new btSphereShape(1);
 		btDefaultMotionState* fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 50, 0)));
 		btScalar mass = 1;
-        btVector3 fallInertia(0, 0, 0);
-        fallShape->calculateLocalInertia(mass, fallInertia);
+		btVector3 fallInertia(0, 0, 0);
+		fallShape->calculateLocalInertia(mass, fallInertia);
 		btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
-        fallRigidBody = new btRigidBody(fallRigidBodyCI);
-        dynamicsWorld->addRigidBody(fallRigidBody);
+		fallRigidBody = new btRigidBody(fallRigidBodyCI);
+		dynamicsWorld->addRigidBody(fallRigidBody);
 	}
 
 // </Тестовый бкок>
@@ -127,11 +127,11 @@ public:
 	void execution()
 	{
 		// <Тест>
-		btTransform worldTrans;
-		btQuaternion rot = worldTrans.getRotation();
-        node001->setOrientation(rot.w(), rot.x(), rot.y(), rot.z());
-        btVector3 pos = worldTrans.getOrigin();
-        node001->setPosition(pos.x(), pos.y(), pos.z());
+	//	btTransform worldTrans;
+	//	btQuaternion rot = worldTrans.getRotation();
+	//	node001->setOrientation(rot.w(), rot.x(), rot.y(), rot.z());
+	//	btVector3 pos = worldTrans.getOrigin();
+	//	node001->setPosition(pos.x(), pos.y(), pos.z());
 		// </Тест>
 		graphics_execution();
 		physics_execution();
