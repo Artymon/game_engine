@@ -2,6 +2,13 @@
 #include <stdio.h>
 #include "Ogre\Ogre.h"
 
+//<Тест>
+#include <OISMouse.h>
+#include <OISKeyboard.h>
+#include <OISJoyStick.h>
+#include <OISInputManager.h>
+//</Тест>
+
 class game_engine
 {
 
@@ -26,12 +33,24 @@ private:
 
 
 // <Тестовые переменные>
+//	OIS::InputManager m_InputManager;
+//	OIS::Keyboard     *mKeyboard;
+
 	Ogre::Entity* sphere001;
 	Ogre::SceneNode *node001;
 	btRigidBody* fallRigidBody;
 // </Тестовые переменные>
 
 
+//<Тест>
+//	void input_init()
+//	{
+//		size_t hWnd = 0;
+//		window->getCustomAttribute("WINDOW", &hWnd);
+//		m_InputManager = OIS::InputManager::createInputSystem(hWnd);
+//		m_Keyboard = static_cast<OIS::Keyboard*>(m_InputManager->createInputObject(OIS::OISKeyboard, false));
+//	}
+//</Тест>
 
 // <Инициализация графики>
 	void graphics_init()
@@ -49,7 +68,7 @@ private:
 		camera->setAspectRatio(Ogre::Real(viewport->getActualWidth())/Ogre::Real(viewport->getActualHeight()));
 	}
 // </Инициализация графики>
-
+int i;
 // <Инициализация физики>
 	void physics_init()
 	{
@@ -59,6 +78,7 @@ private:
 		solver = new btSequentialImpulseConstraintSolver;
 		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,overlappingPairCache,solver,collisionConfiguration);
 		dynamicsWorld->setGravity(btVector3(0,-10,0));
+		i=0;
 	}
 // </Инициализация физики>
 
@@ -73,10 +93,10 @@ private:
 // <Просчёт физики>
 	void physics_execution()
 	{
-	//	dynamicsWorld->stepSimulation(1 / 60.f, 10);
+		for (; i<100; i++)
+		dynamicsWorld->stepSimulation(1 / 60.f, 10);
 		// <Тест>
-	//	btTransform trans;
-	//	fallRigidBody->getMotionState()->getWorldTransform(trans);
+		
 		// </Тест>
 	}
 // </Просчёт физики>
@@ -102,7 +122,7 @@ public:
 		node001->attachObject(sphere001);
 		// Bullet
 		btCollisionShape* fallShape = new btSphereShape(1);
-		btDefaultMotionState* fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 50, 0)));
+		btDefaultMotionState* fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0)));
 		btScalar mass = 1;
 		btVector3 fallInertia(0, 0, 0);
 		fallShape->calculateLocalInertia(mass, fallInertia);
@@ -127,11 +147,12 @@ public:
 	void execution()
 	{
 		// <Тест>
-	//	btTransform worldTrans;
-	//	btQuaternion rot = worldTrans.getRotation();
-	//	node001->setOrientation(rot.w(), rot.x(), rot.y(), rot.z());
-	//	btVector3 pos = worldTrans.getOrigin();
-	//	node001->setPosition(pos.x(), pos.y(), pos.z());
+		btTransform trans;
+		fallRigidBody->getMotionState()->getWorldTransform(trans);
+		btQuaternion rot = trans.getRotation();
+		node001->setOrientation(rot.w(), rot.x(), rot.y(), rot.z());
+		btVector3 pos = trans.getOrigin();
+		node001->setPosition(pos.x(), pos.y(), pos.z());
 		// </Тест>
 		graphics_execution();
 		physics_execution();
