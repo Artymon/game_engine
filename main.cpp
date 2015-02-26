@@ -1,6 +1,6 @@
 #include "btBulletDynamicsCommon.h"
 #include <stdio.h>
-#include "Ogre\Ogre.h"
+#include "Ogre.h"
 
 //<Тест>
 #include <OISMouse.h>
@@ -112,6 +112,47 @@ public:
 		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("resource/sphere.zip","Zip");
 		Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 	}
+    int load_resources( std::string file_name ){
+        std::cout << "Load resources ..." << std::endl;
+
+        long long count = 0;
+        Ogre::ConfigFile file;
+
+//        #if OGRE_DEBUG_MODE
+//            cf.load("../resource/resources_d.cfg");
+//        #else
+//            cf.load("../resource/resources.cfg");
+//        #endif
+        file.load(file_name);
+
+        // Получаем итератор отсчитывающий каждую секцию config-файла
+        Ogre::ConfigFile::SectionIterator sectionIter = file.getSectionIterator();
+
+        // Определяем 3 строки для сохранения данных, которые мы собираемся извлечь
+        Ogre::String sectionName, typeName, dataname;
+        while ( sectionIter.hasMoreElements() ){
+            sectionName = sectionIter.peekNextKey(); // Получаем имя секции
+
+            // Получите настройки, содержащиеся в секции и, в то же самое время продвигаем итератор секции
+            Ogre::ConfigFile::SettingsMultiMap *settings = sectionIter.getNext();
+            Ogre::ConfigFile::SettingsMultiMap::iterator i; // Создаём итератор для самих настроек
+
+            // Пробежимя по каждой настройке в секции
+            for (i = settings->begin(); i != settings->end(); ++i){
+                typeName = i->first;  // Получаем тип
+                dataname = i->second; // и имя ресурсов
+                // Используем имя ресурса, тип ресурса и имя секции, чтобы добавить его к индексу ресурсов:
+                Ogre::ResourceGroupManager::getSingleton().addResourceLocation(dataname, typeName, sectionName);
+                count++;
+            }
+        }
+        // Индексация ресурсов - Загружает текстуры и наверно, ещё что-то. Текстур без этой строчки небыло.
+        Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+        std::cout << "Load resources finished." << std::endl;
+        std::cout << count << " resource(s) loaded." << std::endl;
+        return count;
+    }
 
 	void test_create_objects()
 	{
@@ -165,7 +206,8 @@ int main (void)
 {
 	game_engine game_one;
 	game_one.init();
-	game_one.test_load_resource();
+    game_one.test_load_resource();
+    game_one.load_resources("resources.cfg");
 	game_one.test_create_objects();
 	while(true)
 	{
